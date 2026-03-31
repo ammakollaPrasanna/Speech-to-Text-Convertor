@@ -1,0 +1,708 @@
+<!DOCTYPE html>
+<html ng-app="plmApp">
+<head>
+    <meta charset="UTF-8" />
+    <title>Product Lifecycle Management</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.8.2/angular.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.8.2/angular-route.js"></script>
+    <style>
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            margin: 20px;
+            background-color: #f7f5ff;
+            color: #333;
+        }
+        h1 {
+            color: #6a0dad;
+            text-shadow: 1px 1px 2px #ddd;
+        }
+        nav a {
+            margin-right: 12px;
+            text-decoration: none;
+            font-weight: bold;
+            color: #6a0dad;
+            padding: 6px 12px;
+            border-radius: 6px;
+            transition: background-color 0.3s, color 0.3s;
+        }
+        nav a.active, nav a:hover {
+            background-color: #e6e6fa;
+            color: #4b0082;
+        }
+        section {
+            margin-top: 20px;
+            background: #ffffff;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 4px 10px rgba(106, 13, 173, 0.1);
+        }
+        label {
+            display: block;
+            margin-bottom: 12px;
+            color: #5a2c8f;
+        }
+        input[type="text"], input[type="date"], input[type="time"], textarea {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #c6a9ec;
+            border-radius: 6px;
+            background-color: #faf8ff;
+            margin-top: 4px;
+            box-sizing: border-box;
+        }
+        button {
+            background-color: #a270d6;
+            border: none;
+            color: white;
+            padding: 8px 14px;
+            margin-top: 10px;
+            margin-right: 8px;
+            border-radius: 6px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: background 0.3s ease;
+        }
+        button:hover {
+            background-color: #6a0dad;
+        }
+        .speech-btn {
+            background-color: #e3d5ff;
+            color: #6a0dad;
+            border: 1px solid #c6a9ec;
+            padding: 4px 8px;
+            margin-left: 8px;
+            border-radius: 50%;
+            font-size: 14px;
+            cursor: pointer;
+        }
+        table {
+            border-collapse: collapse;
+            width: 100%;
+            margin-top: 16px;
+            background-color: white;
+        }
+        th {
+            background-color: #bfa2e6;
+            color: white;
+            padding: 10px;
+            text-align: left;
+        }
+        td {
+            border: 1px solid #e3d5ff;
+            padding: 8px;
+            background-color: #f9f5ff;
+        }
+        .discussion {
+            border: 1px solid #d1bfe0;
+            background-color: #f3edff;
+            padding: 12px;
+            margin-bottom: 10px;
+            border-radius: 8px;
+        }
+        ul { list-style: disc; margin-left: 20px; }
+        li { margin-bottom: 6px; }
+        .input-group {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        .input-group input {
+            flex-grow: 1;
+            margin-right: 8px;
+        }
+        .input-group .speech-btn {
+            margin-top: 0;
+        }
+        /* Styles for the Word export content - minimal for basic HTML export */
+        .word-export-content {
+            font-family: Arial, sans-serif;
+            color: black;
+            font-size: 10pt;
+            padding: 30px 40px;
+        }
+        .word-export-content h2 {
+            text-align: center;
+            font-size: 16pt;
+            margin-bottom: 20pt;
+            text-decoration: underline;
+            font-weight: bold;
+        }
+        .word-export-content p {
+            margin-bottom: 8px;
+            font-size: 10pt;
+        }
+        .word-export-content strong {
+            color: #4b0082; /* Adjusted for better visibility in Word doc */
+        }
+        .word-export-content ul {
+            list-style: disc;
+            margin-left: 20px;
+            margin-bottom: 10px;
+        }
+        .word-export-content ol {
+            list-style-type: decimal;
+            padding-left: 15pt;
+            margin-bottom: 15pt;
+        }
+        .word-export-content li {
+            font-size: 9pt;
+            margin-bottom: 4px;
+        }
+        .word-export-content table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20pt;
+            font-size: 9pt;
+        }
+        .word-export-content th, .word-export-content td {
+            border: 1px solid black;
+            padding: 5pt;
+            text-align: left;
+        }
+        .word-export-content th {
+            font-weight: bold;
+            background-color: #D3D3D3; /* Light grey for headers in Word */
+        }
+    </style>
+
+</head>
+
+<body ng-controller="MainCtrl">
+    <h1>Product Lifecycle Management</h1>
+    <nav>
+        <a href="#!/" ng-class="{active: isActive('/')}">Administration</a>
+        <a href="#!/management" ng-class="{active: isActive('/management')}">Management</a>
+        <a href="#!/project" ng-class="{active: isActive('/project')}">Project</a>
+        <a href="#!/design" ng-class="{active: isActive('/design')}">Design</a>
+        <a href="#!/quality" ng-class="{active: isActive('/quality')}">Quality</a>
+        <a href="#!/hardware" ng-class="{active: isActive('/hardware')}">Hardware</a>
+    </nav>
+
+    <section ng-view></section>
+
+    <script type="text/ng-template" id="design.html">
+        <h2>Minutes of Meeting </h2>
+        <div id="momContent">
+            <form>
+                <div class="input-group">
+                    <label>Variant Name:
+                        <input ng-model="newMoM.variantName"> <button type="button" ng-click="startRecognition('variantName')" class="speech-btn">🎤</button>
+                    </label>
+                </div>
+                <div class="input-group">
+                    <label>Part Name:
+                        <input ng-model="newMoM.partName"> <button type="button" ng-click="startRecognition('partName')" class="speech-btn">🎤</button>
+                    </label>
+                </div>
+                <div class="input-group">
+                    <label>Subject:
+                        <input ng-model="newMoM.subject"> <button type="button" ng-click="startRecognition('subject')" class="speech-btn">🎤</button>
+                    </label>
+                </div>
+                <div class="input-group">
+                    <label>Meeting Number:
+                        <input ng-model="newMoM.meetingNumber"> <button type="button" ng-click="startRecognition('meetingNumber')" class="speech-btn">🎤</button>
+                    </label>
+                </div>
+                <div class="input-group">
+                    <label>Title:
+                        <input ng-model="newMoM.title"> <button type="button" ng-click="startRecognition('title')" class="speech-btn">🎤</button>
+                    </label>
+                </div>
+                <div class="input-group">
+                    <label>Keywords:
+                        <input ng-model="newMoM.keywords"> <button type="button" ng-click="startRecognition('keywords')" class="speech-btn">🎤</button>
+                    </label>
+                </div>
+                <div class="input-group">
+                    <label>Meeting Date:
+                        <input type="date" ng-model="newMoM.date"> </label>
+                </div>
+                <div class="input-group">
+                    <label> Meeting Day:
+                        <input ng-model="newMoM.day"> <button type="button" ng-click="startRecognition('day')" class="speech-btn">🎤</button>
+                    </label>
+                </div>
+                <div class="input-group">
+                    <label> Meeting Time:
+                        <input type="time" ng-model="newMoM.time"> </label>
+                </div>
+                <div class="input-group">
+                    <label> Meeting Venue:
+                        <input ng-model="newMoM.venue"> <button type="button" ng-click="startRecognition('venue')" class="speech-btn">🎤</button>
+                    </label>
+                </div>
+                <div class="input-group">
+                    <label> List of Members:
+                        <input ng-model="newMoM.members"> <button type="button" ng-click="startRecognition('members')" class="speech-btn">🎤</button>
+                    </label>
+                </div>
+
+                <div id="momSection" style="padding: 15px; border: 1px solid #ccc; margin-top: 20px;">
+                    <h2>Minutes of Meeting Details</h2>
+                    <hr>
+
+                    <p>
+                        <span style="display:inline-block; width:20px; height:20px; border-radius:50%; background:#4b0082; color:white; text-align:center; line-height:20px; cursor:pointer;"
+                                ng-click="addDiscussion()">+</span>
+                        Click on "+" To Add <b>Discussion</b>
+                    </p>
+                    <div class="input-group">
+                        <input type="text" ng-model="tempDiscussion.text" placeholder="New Discussion" style="width: 70%;">
+                        <button type="button" ng-click="startRecognition('text', tempDiscussion)">🎤</button>
+                        <button type="button" ng-click="addDiscussion()">Add</button>
+                    </div>
+                    <div ng-repeat="d in discussions" class="discussion">
+                        {{$index + 1}}. {{d.text}}
+                        <button type="button" ng-click="startRecognition('text', d)">🎤</button>
+                    </div>
+
+                    <p>
+                        <span style="display:inline-block; width:20px; height:20px; border-radius:50%; background:#4b0082; color:white; text-align:center; line-height:20px; cursor:pointer;"
+                                ng-click="addActionPoint()">+</span>
+                        Click on "+" To Add <b>Action Points and Presentations</b>
+                    </p>
+                    <div class="input-group">
+                        <input type="text" ng-model="tempActionPoint.action" placeholder="Action">
+                        <input type="text" ng-model="tempActionPoint.responsibility" placeholder="Responsibility">
+                        <input type="text" ng-model="tempActionPoint.others" placeholder="Others">
+                        <input type="text" ng-model="tempActionPoint.doc" placeholder="PDC">
+                        <input type="text" ng-model="tempActionPoint.workcenter" placeholder="Work Center">
+                        <button type="button" ng-click="startRecognition('action', tempActionPoint)">🎤</button>
+                        <button type="button" ng-click="addActionPoint()">Add</button>
+                    </div>
+                    <div ng-repeat="a in actionPoints" class="discussion">
+                        {{$index + 1}}. Action: {{a.action}}, Responsibility: {{a.responsibility}}, Others: {{a.others}}, PDC: {{a.doc}}, Work Center: {{a.workcenter}}
+                        <button type="button" ng-click="startRecognition('action', a)">🎤</button>
+                    </div>
+
+                    <p>
+                        <span style="display:inline-block; width:20px; height:20px; border-radius:50%; background:#4b0082; color:white; text-align:center; line-height:20px; cursor:pointer;"
+                                ng-click="addInnovation()">+</span>
+                        Click on "+" To Add <b>Innovativeness/Lessons Learnt</b>
+                    </p>
+                    <div class="input-group">
+                        <input type="text" ng-model="tempInnovation.text" placeholder="New Lesson or Innovation" style="width: 70%;">
+                        <button type="button" ng-click="startRecognition('text', tempInnovation)">🎤</button>
+                        <button type="button" ng-click="addInnovation()">Add</button>
+                    </div>
+                    <div ng-repeat="i in innovations" class="discussion">
+                        {{$index + 1}}. {{i.text}}
+                        <button type="button" ng-click="startRecognition('text', i)">🎤</button>
+                    </div>
+
+                    <p>
+                        <span style="display:inline-block; width:20px; height:20px; border-radius:50%; background:#4b0082; color:white; text-align:center; line-height:20px; cursor:pointer;"
+                                ng-click="addDecision()">+</span>
+                        Click on "+" To Add <b>Decision</b>
+                    </p>
+                    <div class="input-group">
+                        <input type="text" ng-model="tempDecision.text" placeholder="New Decision" style="width: 70%;">
+                        <button type="button" ng-click="startRecognition('text', tempDecision)">🎤</button>
+                        <button type="button" ng-click="addDecision()">Add</button>
+                    </div>
+                    <div ng-repeat="dc in decisions" class="discussion">
+                        {{$index + 1}}. {{dc.text}}
+                        <button type="button" ng-click="startRecognition('text', dc)">🎤</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+
+        <hr>
+        <p>
+            <b>Upload Doc/Presentations/Upload MOM</b>
+        </p>
+
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 30px;">
+            <div>
+                <input type="text" ng-model="searchQuery" placeholder="Search by any field..." style="padding: 5px; width: 200px;">
+            </div>
+
+            <h3 style="margin: 0; text-align: center; flex: 1; color: #4b0082;">List of Minutes of Meeting</h3>
+
+            <div>
+                <button ng-click="receivedMoM()">Received MoM</button>
+            </div>
+        </div>
+
+        <table style="margin-top: 20px;">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Participants Name</th>
+                    <th>Variant Name</th>
+                    <th>Part Name</th>
+                    <th>Subject</th>
+                    <th>Meeting Number</th>
+                    <th>Meeting Date</th>
+                    <th>Meeting Day</th>
+                    <th>Meeting Time</th>
+                    <th>Meeting Venue</th>
+                    <th>Keywords</th>
+                    <th>Upload Doc</th>
+                    <th>View</th>
+                    <th>Update</th>
+                    <th>Generate Word</th> <th>Delete</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr ng-repeat="mom in momList | filter:searchQuery track by $index">
+                    <td>{{ $index + 1 }}</td>
+                    <td>{{ mom.members }}</td>
+                    <td>{{ mom.variantName }}</td>
+                    <td>{{ mom.partName }}</td>
+                    <td>{{ mom.subject }}</td>
+                    <td>{{ mom.meetingNumber }}</td>
+                    <td>{{ mom.date | date:'dd/MM/yyyy' }}</td>
+                    <td>{{ mom.day }}</td>
+                    <td>{{ mom.time }}</td>
+                    <td>{{ mom.venue }}</td>
+                    <td>{{ mom.keywords }}</td>
+                    <td><button>Upload</button></td>
+                    <td><button ng-click="viewMoM(mom)">View</button></td>
+                    <td><button ng-click="editMoM(mom)">Update</button></td>
+                    <td><button ng-click="generateMoMDoc(mom)">Generate Word</button></td> <td><button ng-click="deleteMoM($index)">Delete</button></td>
+                </tr>
+            </tbody>
+        </table>
+    </script>
+
+    <script>
+        var app = angular.module('plmApp', ['ngRoute']);
+
+        app.config(function($routeProvider){
+            $routeProvider
+                .when('/', {
+                    template: '<h2>Administration Section</h2><p>Manage admin tasks here.</p>'
+                })
+                .when('/management', {
+                    template: '<h2>Management Section</h2><p>Management content here.</p>'
+                })
+                .when('/project', {
+                    template: '<h2>Project Section</h2><p>Project info here.</p>'
+                })
+                .when('/design', {
+                    templateUrl: 'design.html',
+                    controller: 'DesignCtrl'
+                })
+                .when('/quality', {
+                    template: '<h2>Quality Section</h2><p>Quality control here.</p>'
+                })
+                .when('/hardware', {
+                    template: '<h2>Hardware Section</h2><p>Hardware info here.</p>'
+                })
+                .otherwise({redirectTo:'/'});
+        });
+
+        app.controller('MainCtrl', function($scope, $location) {
+            $scope.isActive = function(route) {
+                return route === $location.path();
+            };
+        });
+
+        app.controller('DesignCtrl', function($scope){
+            $scope.momList = [];
+            $scope.discussions = [];
+            $scope.actionPoints = [];
+            $scope.innovations = [];
+            $scope.decisions = [];
+
+            $scope.newMoM = {
+                meetingNumber: '', subject: '', title: '', description: '', keywords: '',
+                variantName: '', partName: '', date: '', day: '', time: '', venue: '', members: '',
+                discussions: [], actionPoints: [], innovations: [], decisions: []
+            };
+
+            // Temporary models for adding new dynamic items
+            $scope.tempDiscussion = { text: '' };
+            $scope.tempActionPoint = { action: '', responsibility: '', others: '', doc: '', workcenter: '' };
+            $scope.tempInnovation = { text: '' };
+            $scope.tempDecision = { text: '' };
+
+
+            $scope.startRecognition = function(field, item = null) {
+                if (!('webkitSpeechRecognition' in window)) {
+                    alert('Speech recognition not supported in this browser.');
+                    return;
+                }
+                var recognition = new webkitSpeechRecognition();
+                recognition.lang = 'en-US';
+                recognition.interimResults = false;
+                recognition.maxAlternatives = 1;
+
+                recognition.onresult = function(event) {
+                    $scope.$apply(() => {
+                        let transcript = event.results[0][0].transcript.trim();
+                        if (item) {
+                            // Update specific item in dynamic lists
+                            if (field === 'date') {
+                                try {
+                                    const parsedDate = new Date(transcript);
+                                    if (!isNaN(parsedDate.getTime())) {
+                                        item[field] = parsedDate;
+                                    } else {
+                                        item[field] = transcript;
+                                    }
+                                } catch (e) {
+                                    item[field] = transcript;
+                                }
+                            } else if (field === 'time') {
+                                item[field] = transcript;
+                            } else {
+                                item[field] = (item[field] || '').trim() + ' ' + transcript;
+                            }
+                        } else {
+                            // Update general newMoM fields
+                            if (field === 'date') {
+                                try {
+                                    const parsedDate = new Date(transcript);
+                                    if (!isNaN(parsedDate.getTime())) {
+                                        $scope.newMoM[field] = parsedDate;
+                                    } else {
+                                        $scope.newMoM[field] = transcript;
+                                    }
+                                } catch (e) {
+                                    $scope.newMoM[field] = transcript;
+                                }
+                            } else if (field === 'time') {
+                                $scope.newMoM[field] = transcript;
+                            } else {
+                                $scope.newMoM[field] = ($scope.newMoM[field] || '').trim() + ' ' + transcript;
+                            }
+                        }
+                    });
+                };
+                recognition.onerror = function(event) {
+                    console.error('Speech recognition error:', event.error);
+                    alert('Speech recognition error: ' + event.error);
+                };
+                recognition.start();
+            };
+
+            // Function to add a discussion
+            $scope.addDiscussion = function() {
+                if ($scope.tempDiscussion.text.trim()) {
+                    $scope.discussions.push(angular.copy($scope.tempDiscussion));
+                    $scope.tempDiscussion = { text: '' }; // Clear for next input
+                }
+            };
+
+            // Function to add an action point
+            $scope.addActionPoint = function() {
+                if ($scope.tempActionPoint.action.trim() || $scope.tempActionPoint.responsibility.trim() || $scope.tempActionPoint.others.trim() || $scope.tempActionPoint.doc.trim() || $scope.tempActionPoint.workcenter.trim()) {
+                    $scope.actionPoints.push(angular.copy($scope.tempActionPoint));
+                    $scope.tempActionPoint = { action: '', responsibility: '', others: '', doc: '', workcenter: '' }; // Clear for next input
+                }
+            };
+
+            // Function to add an innovation/lesson learnt
+            $scope.addInnovation = function() {
+                if ($scope.tempInnovation.text.trim()) {
+                    $scope.innovations.push(angular.copy($scope.tempInnovation));
+                    $scope.tempInnovation = { text: '' }; // Clear for next input
+                }
+            };
+
+            // Function to add a decision
+            $scope.addDecision = function() {
+                if ($scope.tempDecision.text.trim()) {
+                    $scope.decisions.push(angular.copy($scope.tempDecision));
+                    $scope.tempDecision = { text: '' }; // Clear for next input
+                }
+            };
+
+            // NEW FUNCTION: "Received MoM" - saves data to the table
+            $scope.receivedMoM = function(){
+                // Ensure all current form data including dynamic lists are captured
+                $scope.newMoM.discussions = angular.copy($scope.discussions);
+                $scope.newMoM.actionPoints = angular.copy($scope.actionPoints);
+                $scope.newMoM.innovations = angular.copy($scope.innovations);
+                $scope.newMoM.decisions = angular.copy($scope.decisions);
+
+                // Basic validation before saving
+                if ($scope.newMoM.meetingNumber || $scope.newMoM.subject || $scope.newMoM.title ||
+                    $scope.newMoM.variantName || $scope.newMoM.partName || $scope.newMoM.members ||
+                    $scope.discussions.length > 0 || $scope.actionPoints.length > 0 ||
+                    $scope.innovations.length > 0 || $scope.decisions.length > 0) {
+
+                    const savedMoM = angular.copy($scope.newMoM); // Make a copy of the *current* form data
+                    $scope.momList.push(savedMoM); // Add this copied MoM to the list
+
+                    alert("MoM information saved to the table!");
+
+                    // Clear the form fields for the next entry
+                    $scope.resetForm();
+                } else {
+                    alert("Please fill at least one main field or add some details (discussions, action points, etc.) to save the MoM.");
+                }
+            };
+
+            // Helper function to reset the form fields
+            $scope.resetForm = function() {
+                for (const key in $scope.newMoM) {
+                    if (['discussions', 'actionPoints', 'innovations', 'decisions'].includes(key)) {
+                        $scope.newMoM[key] = []; // Clear arrays
+                    } else if (key === 'date') {
+                        $scope.newMoM[key] = null; // Clear date input properly
+                    } else {
+                        $scope.newMoM[key] = ''; // Clear other fields
+                    }
+                }
+                $scope.discussions = [];
+                $scope.actionPoints = [];
+                $scope.innovations = [];
+                $scope.decisions = [];
+                $scope.tempDiscussion = { text: '' };
+                $scope.tempActionPoint = { action: '', responsibility: '', others: '', doc: '', workcenter: '' };
+                $scope.tempInnovation = { text: '' };
+                $scope.tempDecision = { text: '' };
+            };
+
+
+            // Function to delete an MoM from the table
+            $scope.deleteMoM = function(index) {
+                if (confirm("Are you sure you want to delete this MoM from the list?")) {
+                    $scope.momList.splice(index, 1);
+                }
+            };
+
+            // Function to view a saved MoM (can expand this later)
+            $scope.viewMoM = function(mom) {
+                alert("Viewing MoM: " + mom.subject + "\nMeeting Number: " + mom.meetingNumber);
+                // In a real app, you might populate a separate view or a modal with this data
+            };
+
+            // Function to edit a saved MoM (can expand this later)
+            $scope.editMoM = function(mom) {
+                alert("Editing MoM: " + mom.subject + "\nMeeting Number: " + mom.meetingNumber);
+                // In a real app, you might load this MoM's data back into the form for editing
+                // For simplicity, just populating the form for demonstration
+                $scope.newMoM = angular.copy(mom);
+                $scope.discussions = angular.copy(mom.discussions || []);
+                $scope.actionPoints = angular.copy(mom.actionPoints || []);
+                $scope.innovations = angular.copy(mom.innovations || []);
+                $scope.decisions = angular.copy(mom.decisions || []);
+            };
+
+            // This is the function that generates the Word document (as .doc via HTML trick)
+            // This function is now called from the "Generate Word" button in each table row.
+            $scope.generateMoMDoc = function(momToExport) {
+                const formattedDate = momToExport.date ? (momToExport.date instanceof Date ? momToExport.date.toLocaleDateString('en-GB') : new Date(momToExport.date).toLocaleDateString('en-GB')) : '';
+
+                let htmlContent = `
+                    <html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'>
+                    <head><meta charset='utf-8'><title>Minutes of Meeting</title></head>
+                    <body>
+                        <div class="word-export-content">
+                            <h2>Minutes of the Meeting (MOM)</h2>
+
+                            <p><strong>Meeting Number :</strong> ${momToExport.meetingNumber || ''}</p>
+                            <p><strong>Date :</strong> ${formattedDate} </p>
+                            <p><strong>Place :</strong> ${momToExport.venue || ''}</p>
+
+                            <p><strong>Subject :</strong> ${momToExport.subject || ''}</p>
+
+                            <p><strong>Meeting Date :</strong> ${formattedDate}</p>
+                            <p><strong>Meeting Time :</strong> ${momToExport.time || ''}</p>
+                            <p><strong>Meeting Venue :</strong> ${momToExport.venue || ''}</p>
+                            
+                            <p><strong>Variant Name :</strong> ${momToExport.variantName || ''}</p>
+                            <p><strong>Part Name :</strong> ${momToExport.partName || ''}</p>
+                            <p><strong>Members Present :</strong> ${momToExport.members || ''}</p>
+
+                            <h3>Discussions :</h3>
+                            <ol>
+                `;
+                if (momToExport.discussions && momToExport.discussions.length > 0) {
+                    momToExport.discussions.forEach((d, index) => {
+                        htmlContent += `<li>${d.text || ''}</li>`;
+                    });
+                } else {
+                    htmlContent += `<li>No discussions recorded.</li>`;
+                }
+                htmlContent += `
+                            </ol>
+
+                            <h3>Action Points :</h3>
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Slno</th>
+                                        <th>Actions</th>
+                                        <th>Responsibility</th>
+                                        <th>Others</th>
+                                        <th>PDC</th>
+                                        <th>Workcenter</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                `;
+                if (momToExport.actionPoints && momToExport.actionPoints.length > 0) {
+                    momToExport.actionPoints.forEach((a, index) => {
+                        htmlContent += `
+                                        <tr>
+                                            <td>${index + 1}</td>
+                                            <td>${a.action || ''}</td>
+                                            <td>${a.responsibility || ''}</td>
+                                            <td>${a.others || ''}</td>
+                                            <td>${a.doc || ''}</td>
+                                            <td>${a.workcenter || ''}</td>
+                                        </tr>
+                        `;
+                    });
+                } else {
+                    htmlContent += `
+                                        <tr>
+                                            <td colspan="6" style="text-align: center;">No action points recorded.</td>
+                                        </tr>
+                        `;
+                }
+                htmlContent += `
+                                </tbody>
+                            </table>
+
+                            <h3>Decisions :</h3>
+                            <ol>
+                `;
+                if (momToExport.decisions && momToExport.decisions.length > 0) {
+                    momToExport.decisions.forEach((dc, index) => {
+                        htmlContent += `<li>${dc.text || ''}</li>`;
+                    });
+                } else {
+                    htmlContent += `<li>No decisions recorded.</li>`;
+                }
+                htmlContent += `
+                            </ol>
+
+                            <h3>Innovativeness/Lessons Learnt :</h3>
+                            <ol>
+                `;
+                if (momToExport.innovations && momToExport.innovations.length > 0) {
+                    momToExport.innovations.forEach((i, index) => {
+                        htmlContent += `<li>${i.text || ''}</li>`;
+                    });
+                } else {
+                    htmlContent += `<li>No innovativeness/lessons learnt recorded.</li>`;
+                }
+                htmlContent += `
+                            </ol>
+                        </div>
+                    </body>
+                    </html>
+                `;
+
+                const filename = `MoM_${momToExport.meetingNumber || 'Unknown'}_${formattedDate.replace(/\//g, '-') || 'NoDate'}.doc`;
+                const blob = new Blob([htmlContent], { type: 'application/msword' });
+
+                const downloadLink = document.createElement('a');
+                downloadLink.href = URL.createObjectURL(blob);
+                downloadLink.download = filename;
+                document.body.appendChild(downloadLink);
+                downloadLink.click();
+                document.body.removeChild(downloadLink);
+            };
+        });
+    </script>
+</body>
+</html>
